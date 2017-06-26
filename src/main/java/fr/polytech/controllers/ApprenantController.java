@@ -14,7 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * Created by Gaëtan
+ * Created by theo
  */
 @Controller
 public class ApprenantController {
@@ -70,14 +70,11 @@ public class ApprenantController {
     }
 
     @RequestMapping(value="/apprenant-modif", method = RequestMethod.POST)
-    public String modifi(@ModelAttribute Apprenant apprenant, Model model){
+    public String modifi(HttpServletRequest request, @RequestParam("id") int id, Model model){
         try{
-            System.out.println(apprenant.getNumapprenant());
-            System.out.println(apprenant.getNomapprenant());
-            System.out.println(apprenant.getPrenomapprenant());
-            Apprenant apprenantToModif = apprenantDao.findBynumapprenant(apprenant.getNumapprenant());
-            apprenantToModif.setNomapprenant(apprenant.getNomapprenant());
-            apprenantToModif.setPrenomapprenant(apprenant.getPrenomapprenant());
+            Apprenant apprenantToModif = apprenantDao.findBynumapprenant(id);
+            apprenantToModif.setNomapprenant(request.getParameter("firstname"));
+            apprenantToModif.setPrenomapprenant(request.getParameter("lastname"));
             apprenantDao.save(apprenantToModif);
         }
         catch (Exception ex) {
@@ -95,9 +92,9 @@ public class ApprenantController {
             request.setAttribute("apprenants", apprenantDao.findBynumapprenant(id));
             destinationPage = "modificationApprenant";
         } catch (Exception e) {
-            System.out.println(e);
-            request.setAttribute("MesErreurs", e.getMessage());
-            destinationPage = "Erreur";
+            request.setAttribute("error", "500 Internal Error");
+            request.setAttribute("message", e.getMessage());
+            destinationPage = "error";
         }
         return new ModelAndView(destinationPage);
     }
